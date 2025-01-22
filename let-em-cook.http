@@ -1,6 +1,0 @@
-@let_em_cook_HostAddress = http://localhost:5286
-
-GET {{let_em_cook_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
