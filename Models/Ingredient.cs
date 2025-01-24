@@ -12,6 +12,6 @@ public class Ingredient
     [Required]
     public string ImageUrl { get; set; }
     
-    public ICollection<Recipe>? Recipes { get; set; }
+    public ICollection<RecipeIngredient>? Recipes { get; set; }
     
 }

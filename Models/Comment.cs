@@ -26,6 +26,4 @@ public class Comment
     
     public ICollection<Comment>? CommentReplies { get; set; }
 
-    
-
 }

@@ -41,7 +41,7 @@ public class Recipe
     public int UserId { get; set; }
     public ApplicationUser Chef { get; set; }
     
-    public ICollection<Ingredient>? Ingredients { get; set; }
+    public ICollection<RecipeIngredient>? Ingredients { get; set; }
     public ICollection<Tag>? Tags { get; set; }
     public ICollection<Vote>? Votes { get; set; }
     public ICollection<Review>? Reviews { get; set; }
