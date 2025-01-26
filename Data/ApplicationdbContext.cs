@@ -29,6 +29,23 @@ namespace let_em_cook.Data
             modelBuilder.Entity<Review>()
                 .Property(e => e.CreatedAt)
                 .HasDefaultValueSql("GETDATE()");
+            
+            
+            
+            modelBuilder.Entity<Recipe>()
+                .HasOne(r => r.Chef)
+                .WithMany(u => u.Recipes)
+                .HasForeignKey(r => r.UserId);
+
+            modelBuilder.Entity<Vote>()
+                .HasOne(v => v.User)
+                .WithMany(u => u.Votes)
+                .HasForeignKey(v => v.UserId);
+
+            modelBuilder.Entity<Review>()
+                .HasOne(r => r.User)
+                .WithMany(u => u.Reviews)
+                .HasForeignKey(r => r.UserId);
         }
     }
 }
