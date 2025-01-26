@@ -51,19 +51,19 @@ namespace let_em_cook.Data
                 .HasOne(r => r.Recipe)
                 .WithMany(r => r.Reviews)
                 .HasForeignKey(r => r.RecipeId)
-                .OnDelete(DeleteBehavior.Restrict); // Change from Cascade to Restrict
+                .OnDelete(DeleteBehavior.Restrict); 
 
             modelBuilder.Entity<Review>()
                 .HasOne(r => r.User)
                 .WithMany(u => u.Reviews)
                 .HasForeignKey(r => r.UserId)
-                .OnDelete(DeleteBehavior.Restrict); // Change from Cascade to Restrict
+                .OnDelete(DeleteBehavior.Restrict); 
             
             modelBuilder.Entity<Vote>()
                 .HasOne(v => v.Recipe)
                 .WithMany(r => r.Votes)
                 .HasForeignKey(v => v.RecipeId)
-                .OnDelete(DeleteBehavior.Restrict); // Avoid cascading delete
+                .OnDelete(DeleteBehavior.Restrict); 
 
             modelBuilder.Entity<ApplicationUser>().ToTable("ApplicationUser");
         }
