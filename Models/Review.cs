@@ -21,7 +21,7 @@ public class Review
     public Recipe Recipe { get; set; }
     
     [Required][ForeignKey("ApplicationUser")]
-    public int UserId { get; set; }
+    public string UserId { get; set; }
     public ApplicationUser User { get; set; }
     
     public ICollection<Comment>? Comments { get; set; }

@@ -38,7 +38,7 @@ public class Recipe
     public DateTime TimeOfPublishement { get; set; }
     
     [Required][ForeignKey("ApplicationUser")]
-    public int UserId { get; set; }
+    public string UserId { get; set; }
     public ApplicationUser Chef { get; set; }
     
     public ICollection<RecipeIngredient>? Ingredients { get; set; }
