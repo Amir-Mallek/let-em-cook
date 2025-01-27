@@ -20,4 +20,7 @@ public class ApplicationUser : IdentityUser
     public ICollection<Recipe> Recipes { get; set; }
     
     public ICollection<Comment> Comments { get; set; }
+
+    [NotMapped]
+    public DateTime SubscriptionDate { get; set; }
 }

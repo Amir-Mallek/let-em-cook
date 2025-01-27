@@ -37,6 +37,9 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 builder.Services.Configure<JwtBearerTokenSettings>(
     builder.Configuration.GetSection("JwtBearerTokenSettings"));
 
+builder.Services.AddScoped<ISubscriberService, SubscriberService>();
+
+
 
 var jwtSettings = builder.Configuration.GetSection("JwtBearerTokenSettings").Get<JwtBearerTokenSettings>();
 builder.Services.AddAuthentication(options =>

@@ -63,7 +63,16 @@ namespace let_em_cook.Data
                 .HasOne(v => v.Recipe)
                 .WithMany(r => r.Votes)
                 .HasForeignKey(v => v.RecipeId)
-                .OnDelete(DeleteBehavior.Restrict); 
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ApplicationUser>()
+        .HasMany(u => u.Subscriptions)
+        .WithMany(u => u.Subscribers)
+        .UsingEntity<Dictionary<string, object>>(
+            "UserSubscriptions",
+            j => j.HasOne<ApplicationUser>().WithMany().HasForeignKey("SubscribedToId"),
+            j => j.HasOne<ApplicationUser>().WithMany().HasForeignKey("SubscriberId"),
+            j => j.Property<DateTime>("SubscriptionDate").HasDefaultValueSql("GETUTCDATE()"));
 
             modelBuilder.Entity<ApplicationUser>().ToTable("ApplicationUser");
         }
