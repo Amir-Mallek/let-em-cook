@@ -33,7 +33,7 @@ builder.Services.AddSingleton<BlobService>();
 builder.Services.AddDbContext<ApplicationdbContext>(options =>
     options.UseSqlServer(connectionString));
 // Add Redis Connexion
-builder.Services.AddSingleton<IConnectionMultiplexer>(_ => 
+builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
     ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("Redis")));
 
 // Add Queue Services
@@ -45,11 +45,15 @@ builder.Services.AddHostedService<EmailProcessingService>();
 builder.Services.AddHostedService<RecipePublicationProcessingService>();
 builder.Services.AddHostedService<ScheduledRecipePublisher>();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+    options.JsonSerializerOptions.WriteIndented = true; // Optional, for pretty formatting
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-    
+
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationdbContext>()
     .AddDefaultTokenProviders();
