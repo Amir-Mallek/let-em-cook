@@ -24,8 +24,8 @@ public class EmailProcessingService : BackgroundService
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            var task = await _emailQueue.DequeueEmailTaskAsync();
-            if (task != null)
+            var task = await _emailQueue.DequeueEmailTaskAsync(); 
+            while(task != null)
             {
                 try
                 {
@@ -49,8 +49,10 @@ public class EmailProcessingService : BackgroundService
                 {
                     _logger.LogError(ex, "Failed to send email");
                 }
+                task = await _emailQueue.DequeueEmailTaskAsync();
             }
-            await Task.Delay(500, stoppingToken); // Adjust delay as needed
+            
+            await Task.Delay(1000, stoppingToken); // Adjust delay as needed
         }
     }
 }

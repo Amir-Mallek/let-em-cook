@@ -27,7 +27,7 @@ public class RecipePublicationProcessingService : BackgroundService
         while (!stoppingToken.IsCancellationRequested)
         {
             var task = await _pubQueue.DequeuePublicationTaskAsync();
-            if (task?.Recipe != null)
+            while(task?.Recipe != null)
             {
                 var chef = task.Recipe.Chef;
                 if (chef?.Subscribers != null)
@@ -42,16 +42,20 @@ public class RecipePublicationProcessingService : BackgroundService
                             ChefName = chef.UserName,
                             RecipeImageUrl = task.Recipe.ImageUrl,
                             RecipeDescription = task.Recipe.Description,
-                            RecipeUrl = $"https://localhost:5001/recipes/{task.Recipe.RecipeId}",  // Change this URL to the actual URL of the recipe
+                            RecipeUrl =
+                                $"https://localhost:5001/recipes/{task.Recipe.RecipeId}", // Change this URL to the actual URL of the recipe
                         });
                     }
-                    _logger.LogInformation($"Recipe {task.Recipe.Name} published by {chef.UserName} has been sent to {chef.Subscribers.Count} subscribers");
+
+                    _logger.LogInformation(
+                        $"Recipe {task.Recipe.Name} published by {chef.UserName} has been sent to {chef.Subscribers.Count} subscribers");
                 }
                 else
                 {
                     _logger.LogInformation(
                         $"Recipe {task.Recipe.Name} published by {chef.UserName} has no subscribers");
                 }
+                task = await _pubQueue.DequeuePublicationTaskAsync();
             }
             await Task.Delay(1000, stoppingToken);  // Wait 1 second before checking the queue again
         }
