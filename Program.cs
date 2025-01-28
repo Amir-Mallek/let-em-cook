@@ -60,6 +60,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 
 builder.Services.Configure<JwtBearerTokenSettings>(
     builder.Configuration.GetSection("JwtBearerTokenSettings"));
+builder.Services.AddScoped<IRecipeService, RecipeService>();
 
 
 var jwtSettings = builder.Configuration.GetSection("JwtBearerTokenSettings").Get<JwtBearerTokenSettings>();
@@ -92,7 +93,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseAuthentication();
-app.UseAuthorization();
 
 app.UseHttpsRedirection();
 

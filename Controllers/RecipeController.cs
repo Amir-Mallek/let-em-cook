@@ -1,10 +1,11 @@
 using let_em_cook.Models;
+using let_em_cook.Services;
 using let_em_cook.Services.Queues;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using let_em_cook.Data;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 
 namespace let_em_cook.Controllers
 {
@@ -12,129 +13,79 @@ namespace let_em_cook.Controllers
     [ApiController]
     public class RecipeController : ControllerBase
     {
-        private readonly ApplicationdbContext _context;
-        private readonly IRecipePublicationQueueService _publicationQueueService;
+        private readonly IRecipeService _recipeService;
 
-        public RecipeController(ApplicationdbContext context, IRecipePublicationQueueService publicationQueueService)
+        public RecipeController(IRecipeService recipeService)
         {
-            _context = context;
-            _publicationQueueService = publicationQueueService;
+            _recipeService = recipeService;
         }
 
         // Create a new recipe and either publish immediately or schedule
         [HttpPost]
-        [Authorize]
         public async Task<ActionResult<Recipe>> CreateRecipe([FromBody] RecipeCreateDto recipe, bool publishImmediately = false)
         {
-            if (recipe == null)
+            try
             {
-                return BadRequest("Recipe data is required.");
+                var recipeObject = await _recipeService.CreateRecipeAsync(recipe, publishImmediately);
+                return CreatedAtAction(nameof(GetRecipe), new { id = recipeObject.RecipeId }, recipeObject);
             }
-
-            // Check if the user already exists in the context
-            var existingUser = await _context.Users.FindAsync(recipe.UserId);
-            if (existingUser == null)
+            catch (ArgumentException ex)
             {
-                return NotFound($"User with ID {recipe.UserId} not found.");
+                return BadRequest(ex.Message);
             }
-
-            var recipeObject = new Recipe
-            {
-                Name = recipe.Name,
-                Description = recipe.Description,
-                Steps = recipe.Steps,
-                Difficulty = recipe.Difficulty,
-                Duration = recipe.Duration,
-                ImageUrl = recipe.ImageUrl,
-                UserId = recipe.UserId,
-                TimeOfPublishement = DateTime.Now,
-                IsPublished = publishImmediately
-            };
-
-            // Link the existing tracked user to the recipe
-            recipeObject.Chef = existingUser;
-
-            _context.Recipes.Add(recipeObject);
-            await _context.SaveChangesAsync();
-
-            // If published immediately, the recipe is saved and published
-            if (publishImmediately)
-            {
-                await _publicationQueueService.EnqueuePublicationTaskAsync(recipeObject);
-            }
-
-            return CreatedAtAction(nameof(GetRecipe), new { id = recipeObject.RecipeId }, recipeObject);
         }
 
         // Get a list of all recipes
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Recipe>>> GetRecipes()
         {
-            var recipes = await _context.Recipes.ToListAsync();
-            return Ok(recipes);
+            var recipes = await _recipeService.GetAllRecipesAsync();
+            return Ok(await recipes.ToListAsync());
         }
 
         // Get a specific recipe by ID
         [HttpGet("{id}")]
         public async Task<ActionResult<Recipe>> GetRecipe(int id)
         {
-            var recipe = await _context.Recipes.FindAsync(id);
-            if (recipe == null)
+            try
             {
-                return NotFound("Recipe not found.");
+                var recipe = await _recipeService.GetRecipeByIdAsync(id);
+                return Ok(recipe);
             }
-            return Ok(recipe);
+            catch (ArgumentException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         // Update an existing recipe
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateRecipe(int id, [FromBody] Recipe updatedRecipe)
         {
-            if (id != updatedRecipe.RecipeId)
+            try
             {
-                return BadRequest("Recipe ID mismatch.");
+                await _recipeService.UpdateRecipeAsync(id, updatedRecipe);
+                return NoContent(); // 204 No Content indicates successful update with no response body
             }
-
-            var recipe = await _context.Recipes.FindAsync(id);
-            if (recipe == null)
+            catch (ArgumentException ex)
             {
-                return NotFound("Recipe not found.");
+                return BadRequest(ex.Message);
             }
-
-            // Update the recipe properties
-            recipe.Name = updatedRecipe.Name;
-            recipe.Description = updatedRecipe.Description;
-            recipe.Steps = updatedRecipe.Steps;
-            recipe.Difficulty = updatedRecipe.Difficulty;
-            recipe.Duration = updatedRecipe.Duration;
-            recipe.NumberOfUpvotes = updatedRecipe.NumberOfUpvotes;
-            recipe.NumberOfDownvotes = updatedRecipe.NumberOfDownvotes;
-            recipe.NumberOfViews = updatedRecipe.NumberOfViews;
-            recipe.ImageUrl = updatedRecipe.ImageUrl;
-            recipe.TimeOfPublishement = updatedRecipe.TimeOfPublishement;
-            recipe.IsPublished = updatedRecipe.IsPublished;
-            recipe.UserId = updatedRecipe.UserId;
-
-            // Save changes to the database
-            await _context.SaveChangesAsync();
-
-            return NoContent(); // 204 No Content indicates successful update with no response body
         }
 
         // Delete a recipe
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRecipe(int id)
         {
-            var recipe = await _context.Recipes.FindAsync(id);
-            if (recipe == null)
+            try
             {
-                return NotFound("Recipe not found.");
+                await _recipeService.DeleteRecipeAsync(id);
+                return NoContent(); // 204 No Content indicates successful deletion
             }
-
-            _context.Recipes.Remove(recipe);
-            await _context.SaveChangesAsync();
-
-            return NoContent(); // 204 No Content indicates successful deletion
+            catch (ArgumentException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
     }
 }
