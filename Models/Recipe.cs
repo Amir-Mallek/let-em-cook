@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace let_em_cook.Models;
@@ -34,8 +35,13 @@ public class Recipe
     [Required]
     public string ImageUrl { get; set; }
     
+    
     [Required][DataType(DataType.Time)]
     public DateTime TimeOfPublishement { get; set; }
+    
+    [Required]
+    [DefaultValue(false)]
+    public bool IsPublished { get; set; } = false;
     
     [Required][ForeignKey("ApplicationUser")]
     public string UserId { get; set; }
