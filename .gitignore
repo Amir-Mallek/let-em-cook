@@ -7,3 +7,4 @@ riderModule.iml
 .env
 /__blobstorage__/
 /__queuestorage__/
+.vs/
