@@ -45,7 +45,7 @@ namespace let_em_cook.Services
                 Duration = recipe.Duration,
                 ImageUrl = recipe.ImageUrl,
                 UserId = recipe.UserId,
-                TimeOfPublishement = DateTime.Now,
+                TimeOfPublishement = recipe.TimeOfPublishement ?? DateTime.Now,
                 IsPublished = publishImmediately,
                 Chef = existingUser
             };

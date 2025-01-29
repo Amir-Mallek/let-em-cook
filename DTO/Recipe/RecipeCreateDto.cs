@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.InteropServices;
 
 namespace let_em_cook.Models
 {
@@ -26,6 +27,9 @@ namespace let_em_cook.Models
         public string ImageUrl { get; set; }
 
         [Required]
-        public string UserId { get; set; }  // Assuming the UserId will be passed as part of the request
+        public string UserId { get; set; }
+
+        [DataType(DataType.Time)]
+        public DateTime? TimeOfPublishement { get; set; }
     }
 }
