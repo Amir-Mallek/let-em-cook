@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace let_em_cook.Services
 {
-    public interface IRecipeService : IGenericService<Recipe>
+    public interface IRecipeService
     {
         Task<Recipe> CreateRecipeAsync(RecipeCreateDto recipe, bool publishImmediately);
         Task<Recipe> GetRecipeByIdAsync(int id);
@@ -45,7 +45,7 @@ namespace let_em_cook.Services
                 Duration = recipe.Duration,
                 ImageUrl = recipe.ImageUrl,
                 UserId = recipe.UserId,
-                TimeOfPublishement = DateTime.Now,
+                TimeOfPublishement = recipe.TimeOfPublishement ?? DateTime.Now,
                 IsPublished = publishImmediately,
                 Chef = existingUser
             };
