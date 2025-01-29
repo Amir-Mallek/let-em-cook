@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace let_em_cook.Services
 {
-    public interface IRecipeService
+    public interface IRecipeService : IGenericService<Recipe>
     {
         Task<Recipe> CreateRecipeAsync(RecipeCreateDto recipe, bool publishImmediately);
         Task<Recipe> GetRecipeByIdAsync(int id);
