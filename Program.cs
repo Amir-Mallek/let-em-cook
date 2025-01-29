@@ -58,6 +58,10 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
+
+builder.Services.AddSingleton<EmailService>();
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
