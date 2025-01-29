@@ -83,6 +83,8 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
+builder.Services.AddScoped<IElasticsearchService, ElasticsearchService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
