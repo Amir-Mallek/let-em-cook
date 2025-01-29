@@ -14,10 +14,13 @@ namespace let_em_cook.Controllers
     public class RecipeController : ControllerBase
     {
         private readonly IRecipeService _recipeService;
+        private readonly IElasticsearchService _elasticsearchService;
 
-        public RecipeController(IRecipeService recipeService)
+
+        public RecipeController(IRecipeService recipeService, IElasticsearchService elasticsearchService)
         {
             _recipeService = recipeService;
+            _elasticsearchService = elasticsearchService;
         }
 
         // Create a new recipe and either publish immediately or schedule
@@ -87,5 +90,13 @@ namespace let_em_cook.Controllers
                 return NotFound(ex.Message);
             }
         }
+        
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<Recipe>>> SearchRecipes([FromQuery] string query)
+        {
+            var recipes = await _elasticsearchService.SearchRecipesAsync(query);
+            return Ok(recipes);
+        }
+
     }
 }

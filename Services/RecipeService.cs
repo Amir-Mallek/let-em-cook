@@ -21,11 +21,17 @@ namespace let_em_cook.Services
     {
         private readonly ApplicationdbContext _context;
         private readonly IRecipePublicationQueueService _publicationQueueService;
+        private readonly IElasticsearchService _elasticsearchService;
 
-        public RecipeService(ApplicationdbContext context, IRecipePublicationQueueService publicationQueueService)
+
+        public RecipeService(
+            ApplicationdbContext context, 
+            IRecipePublicationQueueService publicationQueueService,
+            IElasticsearchService elasticsearchService)
         {
             _context = context;
             _publicationQueueService = publicationQueueService;
+            _elasticsearchService = elasticsearchService;
         }
 
         // Create a new recipe and either publish immediately or schedule
@@ -57,6 +63,8 @@ namespace let_em_cook.Services
             {
                 await _publicationQueueService.EnqueuePublicationTaskAsync(recipeObject);
             }
+            
+            await _elasticsearchService.IndexRecipeAsync(recipeObject);
 
             return recipeObject;
         }
