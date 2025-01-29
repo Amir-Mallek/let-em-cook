@@ -12,14 +12,13 @@ public class SubscribersController : ControllerBase
         _subscriberService = subscriberService;
     }
 
-    // Subscribe a user to a chef
     [HttpPost("subscribe/{userId}/{chefId}")]
     public async Task<IActionResult> SubscribeUserToChef(string userId, string chefId)
     {
         try
         {
             var result = await _subscriberService.SubscribeAsync(userId, chefId);
-            return Ok(new { Success = result, Message = "Subscription successful" });
+            return Ok(new { Success = result, Message = result ? "Subscription successful" : "Error while subscribing." });
         }
         catch (Exception ex)
         {
@@ -27,14 +26,13 @@ public class SubscribersController : ControllerBase
         }
     }
 
-    // Unsubscribe a user from a chef
     [HttpDelete("unsubscribe/{userId}/{chefId}")]
     public async Task<IActionResult> UnsubscribeUserFromChef(string userId, string chefId)
     {
         try
         {
             var result = await _subscriberService.UnsubscribeAsync(userId, chefId);
-            return Ok(new { Success = result, Message = "Unsubscription successful" });
+            return Ok(new { Success = result, Message = result ? "Unsubscription successful" : "Error while unsubscribing." });
         }
         catch (Exception ex)
         {
@@ -42,7 +40,6 @@ public class SubscribersController : ControllerBase
         }
     }
 
-    // Get all subscribers for a chef
     [HttpGet("chef/{chefId}/subscribers")]
     public async Task<IActionResult> GetChefSubscribers(string chefId)
     {
@@ -57,7 +54,6 @@ public class SubscribersController : ControllerBase
         }
     }
 
-    // Get all subscriptions for a user
     [HttpGet("user/{userId}/subscriptions")]
     public async Task<IActionResult> GetUserSubscriptions(string userId)
     {

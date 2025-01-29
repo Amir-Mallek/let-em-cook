@@ -1,10 +1,10 @@
 using let_em_cook.Data;
 using let_em_cook.DTO;
 using let_em_cook.Models;
+using let_em_cook.Repositories;
 using let_em_cook.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 
 
 //placeholder for the mailing service
@@ -16,18 +16,16 @@ public interface IMailingService
 public class SubscriberService : ISubscriberService
 {
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly ApplicationdbContext _context;
     private readonly IMailingService _mailingService;
+
+    private readonly UserRepository _userRepo;
 
     public SubscriberService(
         UserManager<ApplicationUser> userManager,
-        ApplicationdbContext context,
-        IMailingService mailingService)
+        ApplicationdbContext context) : base()
     {
         _userManager = userManager;
-        _context = context;
-        _mailingService = mailingService;
-
+        _userRepo = new UserRepository(context);
     }
 
     public async Task<bool> SubscribeAsync(string userId, string chefId)
@@ -92,9 +90,13 @@ public class SubscriberService : ISubscriberService
 
     public async Task<IEnumerable<SubscriberDto>> GetSubscribersForChefAsync(string chefId)
     {
-        return await _context.Users
-            .Where(u => u.Id == chefId)
-            .SelectMany(u => u.Subscribers)
+        IEnumerable<ApplicationUser>? subscribers;
+        try {
+            subscribers = await _userRepo.GetSubscribersForChefAsync(chefId);
+        } catch (Exception ex) {
+            throw new Exception("An error occurred while fetching subscribers", ex);
+        }
+        return subscribers
             .Select(u => new SubscriberDto
             {
                 Id = u.Id,
@@ -102,21 +104,26 @@ public class SubscriberService : ISubscriberService
                 Email = u.Email,
                 Country = u.Country
             })
-            .ToListAsync();
+            .ToList();
     }
 
     public async Task<IEnumerable<SubscriptionDto>> GetSubscriptionsForUserAsync(string userId)
     {
-        return await _context.Users
-            .Where(u => u.Id == userId)
-            .SelectMany(u => u.Subscriptions)
+        IEnumerable<ApplicationUser>? subscriptions;
+        try {
+         subscriptions = await _userRepo.GetSubscriptionsForUserAsync(userId);
+        } catch (Exception ex) {
+            throw new Exception("An error occurred while fetching subscriptions", ex);
+        }
+
+        return subscriptions
             .Select(u => new SubscriptionDto
             {
                 ChefId = u.Id,
                 ChefName = u.UserName,
                 SubscriptionDate = DateTime.UtcNow 
             })
-            .ToListAsync();
+            .ToList();
     }
 
     public async Task NotifySubscribersAsync(Recipe recipe)
