@@ -4,7 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using DotNetEnv;
 using Azure.Storage.Blobs;
 using let_em_cook.Models;
+using let_em_cook.Repositories;
 using let_em_cook.Services;
+using let_em_cook.Services.ServiceContracts;
 using Microsoft.AspNetCore.Identity;
 using let_em_cook.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -21,6 +23,13 @@ var blobStorageConnectionString = Environment.GetEnvironmentVariable("BlobStorag
 
 builder.Services.AddSingleton(x => new BlobServiceClient(blobStorageConnectionString));
 builder.Services.AddSingleton<BlobService>();
+
+builder.Services.AddScoped<IRepository<Vote>, Repository<Vote>>();
+builder.Services.AddScoped<IRepository<Recipe>, Repository<Recipe>>();
+builder.Services.AddScoped<ReviewRepository>();
+
+builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<IVoteService, VoteService>();
 
 builder.Services.AddDbContext<ApplicationdbContext>(options =>
     options.UseSqlServer(connectionString));
