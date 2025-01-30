@@ -1,3 +1,7 @@
+using System.Text.Json;
+using let_em_cook.Configuration;
+using Microsoft.Extensions.Options;
+
 namespace let_em_cook.Services;
 using System;
 using System.Collections.Generic;
@@ -10,30 +14,68 @@ using let_em_cook.Models;
 public class ElasticsearchService : IElasticsearchService
 {
     private readonly ElasticsearchClient _client;
-    private readonly string _indexName;
+    private readonly ElasticSettings _elasticSettings;
 
-    public ElasticsearchService(IConfiguration configuration)
+    public ElasticsearchService(IOptions<ElasticSettings> configuration)
     {
-        var settings = new ElasticsearchClientSettings(new Uri(configuration["Elasticsearch:Url"]));
+        _elasticSettings = configuration.Value;
+        var settings = new ElasticsearchClientSettings(new Uri(_elasticSettings.Url))
+            .DefaultIndex(_elasticSettings.DefaultIndex);
+        
         _client = new ElasticsearchClient(settings);
-        _indexName = configuration["Elasticsearch:IndexName"];
+        
+        this.CreateIndexIfNotExists("recipes").Wait();
     }
 
-    public async Task IndexRecipeAsync(Recipe recipe)
+    private async Task CreateIndexIfNotExists(string indexName)
     {
-        await _client.IndexAsync(recipe, idx => idx.Index(_indexName));
+        if (!_client.Indices.Exists(indexName).Exists) 
+            await _client.Indices.CreateAsync(indexName);
     }
 
-    public async Task<IEnumerable<Recipe>> SearchRecipesAsync(string query)
+    public async Task<bool> AddOrUpdateRecipe(Recipe recipe)
     {
-        var response = await _client.SearchAsync<Recipe>(s => s
-            .Index(_indexName)
-            .Query(q => q.Match(m => m
-                .Field(f => f.Name)
-                .Query(query)
-            ))
-        );
+        var response = await _client.IndexAsync(recipe, idx =>
+            idx.Index(_elasticSettings.DefaultIndex)
+                .OpType(OpType.Index));
 
-        return response.Documents;
+        return response.IsValidResponse;
     }
+
+    public async Task<Recipe> GetRecipe(string key)
+    {
+        var response = await _client.GetAsync<Recipe>(key, g => g.Index(_elasticSettings.DefaultIndex));
+        
+        return response.Source;
+    }
+
+    public async Task<IEnumerable<Recipe>> SearchRecipe(string query)
+    {
+        var searchRequest = new SearchRequest<Recipe>(_elasticSettings.DefaultIndex)
+        {
+            Query = new MultiMatchQuery
+            {
+                Query = query,
+                Fields = new[] { "name", "description" }
+            }
+        };
+
+        var response = await _client.SearchAsync<Recipe>(searchRequest);
+
+        if (response.IsValidResponse)
+        {
+            return response.Documents;
+        }
+
+        return new List<Recipe>();
+    }
+
+    public async Task<bool> RemoveRecipe(string key)
+    {
+        var response = await _client.DeleteAsync<Recipe>(key, g => g.Index(_elasticSettings.DefaultIndex));
+
+        return response.IsValidResponse;
+    }
+    
+
 }

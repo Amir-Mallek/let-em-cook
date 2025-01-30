@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using DotNetEnv;
 using Azure.Storage.Blobs;
 using let_em_cook.BackgroundServices;
+using let_em_cook.Configuration;
 using let_em_cook.Models;
 using let_em_cook.Services;
 using Microsoft.AspNetCore.Identity;
@@ -83,6 +84,7 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
+builder.Services.Configure<ElasticSettings>(builder.Configuration.GetSection("Elasticsearch"));
 builder.Services.AddScoped<IElasticsearchService, ElasticsearchService>();
 
 var app = builder.Build();

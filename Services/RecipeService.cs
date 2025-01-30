@@ -64,7 +64,7 @@ namespace let_em_cook.Services
                 await _publicationQueueService.EnqueuePublicationTaskAsync(recipeObject);
             }
             
-            await _elasticsearchService.IndexRecipeAsync(recipeObject);
+            await _elasticsearchService.AddOrUpdateRecipe(recipeObject);
 
             return recipeObject;
         }
@@ -108,6 +108,9 @@ namespace let_em_cook.Services
             recipe.UserId = updatedRecipe.UserId;
 
             await _context.SaveChangesAsync();
+            
+            await _elasticsearchService.AddOrUpdateRecipe(recipe);
+            
             return true;
         }
 

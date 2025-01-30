@@ -94,8 +94,20 @@ namespace let_em_cook.Controllers
         [HttpGet("search")]
         public async Task<ActionResult<IEnumerable<Recipe>>> SearchRecipes([FromQuery] string query)
         {
-            var recipes = await _elasticsearchService.SearchRecipesAsync(query);
-            return Ok(recipes);
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return BadRequest("Query parameter is required.");
+            }
+
+            try
+            {
+                var recipes = await _elasticsearchService.SearchRecipe(query);
+                return Ok(recipes);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An error occurred while searching for recipes.");
+            }
         }
 
     }

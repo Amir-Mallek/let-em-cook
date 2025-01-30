@@ -81,6 +81,6 @@ public class AuthController : Controller
             expires: DateTime.Now.AddSeconds(_jwtSettings.ExpireTimeInSeconds),
             signingCredentials: creds);
 
-        return Ok(new { token = new JwtSecurityTokenHandler().WriteToken(token) });
+        return Ok(new { token = new JwtSecurityTokenHandler().WriteToken(token), userId = user.Id  });
     }
 }
