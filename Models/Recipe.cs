@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Newtonsoft.Json;
 
 namespace let_em_cook.Models;
 
@@ -45,6 +46,8 @@ public class Recipe
     
     [Required][ForeignKey("ApplicationUser")]
     public string UserId { get; set; }
+    
+    [JsonIgnore]
     public ApplicationUser Chef { get; set; }
     
     public ICollection<RecipeIngredient>? Ingredients { get; set; }
