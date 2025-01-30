@@ -25,7 +25,7 @@ namespace let_em_cook.Services
 
 
         public RecipeService(
-            ApplicationdbContext context, 
+            ApplicationdbContext context,
             IRecipePublicationQueueService publicationQueueService,
             IElasticsearchService elasticsearchService)
         {
@@ -55,15 +55,15 @@ namespace let_em_cook.Services
                 IsPublished = publishImmediately,
                 Chef = existingUser
             };
-
+            _context.Entry(existingUser).State = EntityState.Unchanged;
             _context.Recipes.Add(recipeObject);
             await _context.SaveChangesAsync();
-
+            await _context.Entry(recipeObject).Reference(r => r.Chef).LoadAsync();
             if (publishImmediately)
             {
                 await _publicationQueueService.EnqueuePublicationTaskAsync(recipeObject);
             }
-            
+
             await _elasticsearchService.AddOrUpdateRecipe(recipeObject);
 
             return recipeObject;
@@ -108,9 +108,9 @@ namespace let_em_cook.Services
             recipe.UserId = updatedRecipe.UserId;
 
             await _context.SaveChangesAsync();
-            
+
             await _elasticsearchService.AddOrUpdateRecipe(recipe);
-            
+
             return true;
         }
 
