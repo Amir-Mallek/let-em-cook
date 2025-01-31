@@ -26,8 +26,10 @@ builder.Services.AddSingleton<BlobService>();
 
 builder.Services.AddScoped<IRepository<Vote>, Repository<Vote>>();
 builder.Services.AddScoped<IRepository<Recipe>, Repository<Recipe>>();
+builder.Services.AddScoped<CommentRepository>();
 builder.Services.AddScoped<ReviewRepository>();
 
+builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IVoteService, VoteService>();
 
@@ -55,6 +57,7 @@ builder.Services.AddAuthentication(options =>
     })
     .AddJwtBearer(options =>
     {
+        options.RequireHttpsMetadata = false;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -66,6 +69,7 @@ builder.Services.AddAuthentication(options =>
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey))
         };
     });
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 

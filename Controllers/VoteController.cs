@@ -34,12 +34,14 @@ public class VoteController : Controller
     }
     
     [HttpGet("/recipe/{recipeId:int}")]
+    [AllowAnonymous]
     public async Task<IEnumerable<Vote>> GetVotes(int recipeId)
     {
         return await _voteService.GetVotes(recipeId);
     }
     
     [HttpGet("{voteId:int}")]
+    [AllowAnonymous]
     public async Task<Vote> GetVote(int voteId)
     {
         return await _voteService.GetVote(voteId);

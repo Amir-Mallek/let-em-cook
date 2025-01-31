@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace let_em_cook.Controllers;
 
+[ApiController]
+[Route("api/[controller]")]
 public class CommentController : Controller
 {
     private readonly ICommentService _commentService;
@@ -31,6 +33,7 @@ public class CommentController : Controller
     
     
     [HttpGet("review")]
+    [AllowAnonymous]
     public async Task<ICollection<Comment>> GetReviewComments(
         int reviewId,
         int page = 1,
@@ -42,6 +45,7 @@ public class CommentController : Controller
     }
     
     [HttpGet("reply")]
+    [AllowAnonymous]
     public async Task<ICollection<Comment>> GetCommentReplies(
         int commentId,
         int page = 1,
@@ -53,6 +57,7 @@ public class CommentController : Controller
     }
     
     [HttpGet("{commentId:int}")]
+    [AllowAnonymous]
     public async Task<Comment> GetComment(int commentId)
     {
         return await _commentService.GetComment(commentId);

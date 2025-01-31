@@ -1,8 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
 using let_em_cook.DTO;
 using let_em_cook.Models;
-using let_em_cook.Services;
+using let_em_cook.Services.ServiceContracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,9 +11,9 @@ namespace let_em_cook.Controllers;
 [Route("api/[controller]")]
 public class ReviewController : Controller
 {
-    private readonly ReviewService _reviewService;
+    private readonly IReviewService _reviewService;
     
-    public ReviewController(ReviewService reviewService)
+    public ReviewController(IReviewService reviewService)
     {
         _reviewService = reviewService;
     }
@@ -23,11 +22,12 @@ public class ReviewController : Controller
     [Authorize]
     public async Task<Review> CreateReview(ReviewDto reviewDto)
     {
-        var userId = User.Claims.First(c => c.Type == ClaimTypes.Name).Value;
+        var userId = User.Claims.First(c => c.Type == "Name").Value;
         return await _reviewService.CreateReview(reviewDto, userId);
     }
     
     [HttpGet]
+    [AllowAnonymous]
     public async Task<ICollection<Review>> GetReviews(
         [FromQuery][Required] int recipeId, 
         [FromQuery] int page = 1,
@@ -39,6 +39,7 @@ public class ReviewController : Controller
     }
     
     [HttpGet("{reviewId:int}")]
+    [AllowAnonymous]
     public async Task<Review?> GetReview(int reviewId)
     {
         return await _reviewService.GetReview(reviewId);
