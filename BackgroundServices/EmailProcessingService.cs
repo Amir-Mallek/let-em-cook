@@ -1,4 +1,6 @@
-﻿using let_em_cook.Services.Queues;
+﻿using let_em_cook.Models.Email;
+using let_em_cook.Services;
+using let_em_cook.Services.Queues;
 using Microsoft.EntityFrameworkCore.Diagnostics.Internal;
 
 namespace let_em_cook.BackgroundServices;
@@ -8,16 +10,22 @@ public class EmailProcessingService : BackgroundService
     private readonly IEmailQueueService _emailQueue;
     private readonly ILogger<EmailProcessingService> _logger;
     private readonly IServiceScopeFactory _scopeFactory;
+    IEmailTemplateService _emailTemplateService;
+    EmailService _emailService;
 
 
     public EmailProcessingService(
         IEmailQueueService emailQueue,
         ILogger<EmailProcessingService> logger,
-        IServiceScopeFactory scopedFactory)
+        IServiceScopeFactory? scopedFactory,
+        IEmailTemplateService emailTemplateService,
+        EmailService emailService)
     {
         _emailQueue = emailQueue;
         _logger = logger;
         _scopeFactory = scopedFactory;
+        _emailTemplateService = emailTemplateService;
+        _emailService = emailService;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -42,6 +50,15 @@ public class EmailProcessingService : BackgroundService
                                                 task.SubscriberName,
                                                 task.SubscriberEmail
                                                 );*/
+                        var model = new NewRecipeNotification(
+                            task.RecipeTitle,
+                            task.RecipeDescription,
+                            task.RecipeUrl,
+                            task.RecipeImageUrl,
+                            task.ChefName,
+                            task.SubscriberName
+                        );
+                        await _emailService.SendEmailAsync(task.SubscriberEmail, "New Recipe Notification!!!", _emailTemplateService.GenerateNewRecipeNotification(model));
                         _logger.LogInformation($"Email sent to {task.SubscriberEmail}");
                     }
                 }
