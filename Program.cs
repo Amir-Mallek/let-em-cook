@@ -46,6 +46,10 @@ builder.Services.AddSingleton<IRecipePublicationQueueService, RecipePublicationQ
 builder.Services.AddHostedService<EmailProcessingService>();
 builder.Services.AddHostedService<RecipePublicationProcessingService>();
 builder.Services.AddHostedService<ScheduledRecipePublisher>();
+// Add mailing and mail template services
+builder.Services.AddSingleton<IEmailTemplateService,EmailTemplateService>();
+builder.Services.AddSingleton<EmailService>();
+builder.Services.AddControllers();
 
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
