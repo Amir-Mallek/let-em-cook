@@ -25,6 +25,7 @@ namespace let_em_cook.Controllers
 
         // Create a new recipe and either publish immediately or schedule
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<Recipe>> CreateRecipe([FromBody] RecipeCreateDto recipe, bool publishImmediately = false)
         {
             try
