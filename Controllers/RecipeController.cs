@@ -25,7 +25,7 @@ namespace let_em_cook.Controllers
 
         // Create a new recipe and either publish immediately or schedule
         [HttpPost]
-        public async Task<ActionResult<Recipe>> CreateRecipe([FromBody] RecipeCreateDto recipe, bool publishImmediately = false)
+        public async Task<ActionResult<RecipeDto>> CreateRecipe([FromBody] RecipeCreateDto recipe, bool publishImmediately = false)
         {
             try
             {
@@ -40,15 +40,27 @@ namespace let_em_cook.Controllers
 
         // Get a list of all recipes
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Recipe>>> GetRecipes()
+        public async Task<ActionResult<IEnumerable<RecipeDto>>> GetRecipes(
+    [FromQuery] int pageNumber = 1,
+    [FromQuery] int pageSize = 10)
         {
-            var recipes = await _recipeService.GetAllRecipesAsync();
-            return Ok(await recipes.ToListAsync());
+            var (recipes, totalCount) = await _recipeService.GetAllRecipesAsync(pageNumber, pageSize);
+
+            var response = new
+            {
+                TotalItems = totalCount,
+                TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
+                CurrentPage = pageNumber,
+                PageSize = pageSize,
+                Recipes = recipes
+            };
+
+            return Ok(response);
         }
 
         // Get a specific recipe by ID
         [HttpGet("{id}")]
-        public async Task<ActionResult<Recipe>> GetRecipe(int id)
+        public async Task<ActionResult<RecipeDto>> GetRecipe(int id)
         {
             try
             {
@@ -90,7 +102,7 @@ namespace let_em_cook.Controllers
                 return NotFound(ex.Message);
             }
         }
-        
+
         [HttpGet("search")]
         public async Task<ActionResult<IEnumerable<Recipe>>> SearchRecipes([FromQuery] string query)
         {

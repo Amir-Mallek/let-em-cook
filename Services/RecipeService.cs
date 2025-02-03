@@ -10,9 +10,9 @@ namespace let_em_cook.Services
 {
     public interface IRecipeService
     {
-        Task<Recipe> CreateRecipeAsync(RecipeCreateDto recipe, bool publishImmediately);
-        Task<Recipe> GetRecipeByIdAsync(int id);
-        Task<IQueryable<Recipe>> GetAllRecipesAsync();
+        Task<RecipeDto> CreateRecipeAsync(RecipeCreateDto recipe, bool publishImmediately);
+        Task<RecipeDto> GetRecipeByIdAsync(int id);
+        Task<(IEnumerable<RecipeDto>, int)> GetAllRecipesAsync(int pageNumber, int pageSize);
         Task<bool> UpdateRecipeAsync(int id, Recipe updatedRecipe);
         Task<bool> DeleteRecipeAsync(int id);
     }
@@ -35,7 +35,7 @@ namespace let_em_cook.Services
         }
 
         // Create a new recipe and either publish immediately or schedule
-        public async Task<Recipe> CreateRecipeAsync(RecipeCreateDto recipe, bool publishImmediately)
+        public async Task<RecipeDto> CreateRecipeAsync(RecipeCreateDto recipe, bool publishImmediately)
         {
             if (recipe == null) throw new ArgumentException("Recipe data is required.");
 
@@ -66,21 +66,32 @@ namespace let_em_cook.Services
 
             await _elasticsearchService.AddOrUpdateRecipe(recipeObject);
 
-            return recipeObject;
+            return RecipeDto.FromRecipe(recipeObject);
         }
 
         // Get a recipe by ID
-        public async Task<Recipe> GetRecipeByIdAsync(int id)
+        public async Task<RecipeDto> GetRecipeByIdAsync(int id)
         {
-            var recipe = await _context.Recipes.FindAsync(id);
+            var recipe = await _context.Recipes
+                .Include(r => r.Chef) // Include Chef data
+                .FirstOrDefaultAsync(r => r.RecipeId == id);
+
             if (recipe == null) throw new ArgumentException("Recipe not found.");
-            return recipe;
+            return RecipeDto.FromRecipe(recipe);
         }
 
+
         // Get all recipes
-        public async Task<IQueryable<Recipe>> GetAllRecipesAsync()
+        public async Task<(IEnumerable<RecipeDto>, int)> GetAllRecipesAsync(int pageNumber, int pageSize)
         {
-            return _context.Recipes.AsQueryable();
+            var totalCount = await _context.Recipes.CountAsync();
+            var recipes = await _context.Recipes
+                .Skip((pageNumber - 1) * pageSize)
+                .Include(r => r.Chef)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (recipes.Select(RecipeDto.FromRecipe), totalCount);
         }
 
         // Update an existing recipe
