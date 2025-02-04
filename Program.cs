@@ -55,6 +55,7 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
 // Add Queue Services
 builder.Services.AddSingleton<IEmailQueueService, EmailQueueService>();
 builder.Services.AddSingleton<IRecipePublicationQueueService, RecipePublicationQueueService>();
+builder.Services.AddScoped<ISubscriberService, SubscriberService>();
 
 // Add Background Services
 builder.Services.AddHostedService<EmailProcessingService>();

@@ -12,8 +12,8 @@ using let_em_cook.Data;
 namespace let_em_cook.Migrations
 {
     [DbContext(typeof(ApplicationdbContext))]
-    [Migration("20250204195145_mymigration")]
-    partial class mymigration
+    [Migration("20250204205953_inbitial migration")]
+    partial class inbitialmigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

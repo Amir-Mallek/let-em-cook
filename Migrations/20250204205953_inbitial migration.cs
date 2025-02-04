@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace let_em_cook.Migrations
 {
     /// <inheritdoc />
-    public partial class mymigration : Migration
+    public partial class inbitialmigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
