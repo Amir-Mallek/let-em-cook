@@ -36,12 +36,15 @@ builder.Services.AddSingleton<BlobService>();
 
 builder.Services.AddScoped<IRepository<Vote>, Repository<Vote>>();
 builder.Services.AddScoped<IRepository<Recipe>, Repository<Recipe>>();
+builder.Services.AddScoped<IRepository<Image>, Repository<Image>>();
 builder.Services.AddScoped<CommentRepository>();
 builder.Services.AddScoped<ReviewRepository>();
 
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IVoteService, VoteService>();
+builder.Services.AddScoped<IImageService, ImageService>();
+builder.Services.AddSingleton<IFileService, FileService>();
 
 builder.Services.AddDbContext<ApplicationdbContext>(options =>
     options.UseSqlServer(connectionString));
