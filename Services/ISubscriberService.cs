@@ -6,6 +6,6 @@ public interface ISubscriberService
 {
     Task<bool> SubscribeAsync(string userId, string chefId);
     Task<bool> UnsubscribeAsync(string userId, string chefId);
-    // Task<IEnumerable<SubscriberDto>> GetSubscribersForChefAsync(string chefId);
-    // Task<IEnumerable<SubscriptionDto>> GetSubscriptionsForUserAsync(string userId);
+    Task<IEnumerable<SubscriberDto>> GetSubscribersForChefAsync(string chefId);
+    Task<IEnumerable<SubscriptionDto>> GetSubscriptionsForUserAsync(string userId);
 }

@@ -12,14 +12,14 @@ public class SubscriberService : ISubscriberService
 {
     private readonly UserManager<ApplicationUser> _userManager;
 
-    //private readonly UserRepository _userRepo;
+    private readonly UserRepository _userRepo;
 
     public SubscriberService(
         UserManager<ApplicationUser> userManager,
         ApplicationdbContext context) : base()
     {
         _userManager = userManager;
-        //_userRepo = new UserRepository(context);
+        _userRepo = new UserRepository(context);
     }
 
     public async Task<bool> SubscribeAsync(string userId, string chefId)
@@ -76,41 +76,41 @@ public class SubscriberService : ISubscriberService
         return userResult.Succeeded && chefResult.Succeeded;
     }
 
-    // public async Task<IEnumerable<SubscriberDto>> GetSubscribersForChefAsync(string chefId)
-    // {
-    //     IEnumerable<ApplicationUser>? subscribers;
-    //     try {
-    //         subscribers = await _userRepo.GetSubscribersForChefAsync(chefId);
-    //     } catch (Exception ex) {
-    //         throw new Exception("An error occurred while fetching subscribers", ex);
-    //     }
-    //     return subscribers
-    //         .Select(u => new SubscriberDto
-    //         {
-    //             Id = u.Id,
-    //             UserName = u.UserName,
-    //             Email = u.Email,
-    //             Country = u.Country
-    //         })
-    //         .ToList();
-    // }
-    //
-    // public async Task<IEnumerable<SubscriptionDto>> GetSubscriptionsForUserAsync(string userId)
-    // {
-    //     IEnumerable<ApplicationUser>? subscriptions;
-    //     try {
-    //      subscriptions = await _userRepo.GetSubscriptionsForUserAsync(userId);
-    //     } catch (Exception ex) {
-    //         throw new Exception("An error occurred while fetching subscriptions", ex);
-    //     }
-    //
-    //     return subscriptions
-    //         .Select(u => new SubscriptionDto
-    //         {
-    //             ChefId = u.Id,
-    //             ChefName = u.UserName,
-    //             SubscriptionDate = DateTime.UtcNow 
-    //         })
-    //         .ToList();
-    // }    
+    public async Task<IEnumerable<SubscriberDto>> GetSubscribersForChefAsync(string chefId)
+    {
+        IEnumerable<ApplicationUser>? subscribers;
+        try {
+            subscribers = await _userRepo.GetSubscribersForChefAsync(chefId);
+        } catch (Exception ex) {
+            throw new Exception("An error occurred while fetching subscribers", ex);
+        }
+        return subscribers
+            .Select(u => new SubscriberDto
+            {
+                Id = u.Id,
+                UserName = u.UserName,
+                Email = u.Email,
+                Country = u.Country
+            })
+            .ToList();
+    }
+    
+    public async Task<IEnumerable<SubscriptionDto>> GetSubscriptionsForUserAsync(string userId)
+    {
+        IEnumerable<ApplicationUser>? subscriptions;
+        try {
+         subscriptions = await _userRepo.GetSubscriptionsForUserAsync(userId);
+        } catch (Exception ex) {
+            throw new Exception("An error occurred while fetching subscriptions", ex);
+        }
+    
+        return subscriptions
+            .Select(u => new SubscriptionDto
+            {
+                ChefId = u.Id,
+                ChefName = u.UserName,
+                SubscriptionDate = DateTime.UtcNow 
+            })
+            .ToList();
+    }    
 }

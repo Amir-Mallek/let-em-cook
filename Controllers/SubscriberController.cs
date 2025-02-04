@@ -43,31 +43,31 @@ public class SubscribersController : ControllerBase
         }
     }
 
-    // [HttpGet("chef/{chefId}/subscribers")]
-    // public async Task<IActionResult> GetChefSubscribers(string chefId)
-    // {
-    //     try
-    //     {
-    //         var subscribers = await _subscriberService.GetSubscribersForChefAsync(chefId);
-    //         return Ok(subscribers);
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         return NotFound(new { Message = ex.Message });
-    //     }
-    // }
-    //
-    // [HttpGet("user/{userId}/subscriptions")]
-    // public async Task<IActionResult> GetUserSubscriptions(string userId)
-    // {
-    //     try
-    //     {
-    //         var subscriptions = await _subscriberService.GetSubscriptionsForUserAsync(userId);
-    //         return Ok(subscriptions);
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         return NotFound(new { Message = ex.Message });
-    //     }
-    // }
+    [HttpGet("chef/{chefId}/subscribers")]
+    public async Task<IActionResult> GetChefSubscribers(string chefId)
+    {
+        try
+        {
+            var subscribers = await _subscriberService.GetSubscribersForChefAsync(chefId);
+            return Ok(subscribers);
+        }
+        catch (Exception ex)
+        {
+            return NotFound(new { Message = ex.Message });
+        }
+    }
+    
+    [HttpGet("user/{userId}/subscriptions")]
+    public async Task<IActionResult> GetUserSubscriptions(string userId)
+    {
+        try
+        {
+            var subscriptions = await _subscriberService.GetSubscriptionsForUserAsync(userId);
+            return Ok(subscriptions);
+        }
+        catch (Exception ex)
+        {
+            return NotFound(new { Message = ex.Message });
+        }
+    }
 }
