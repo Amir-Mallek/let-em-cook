@@ -33,7 +33,7 @@ public class ScheduledRecipePublisher : BackgroundService
                     .ThenInclude(c => c.Subscribers)
                     .Include(r => r.Ingredients)
                     .Include(r => r.Tags)
-                    .Where(r => !r.IsPublished && r.TimeOfPublishement <= DateTime.UtcNow)
+                    .Where(r => !r.IsPublished && r.TimeOfPublishement <= DateTime.UtcNow.AddHours(1))
                     .ToListAsync();
                 
                 if(dueRecipes.Any())
@@ -47,7 +47,7 @@ public class ScheduledRecipePublisher : BackgroundService
                 }
                 else
                 {
-                    _logger.LogInformation($"No due recipes in the queue for publication");
+                    _logger.LogInformation($"No due recipes in the queue for publication ata time {DateTime.UtcNow.AddHours(1)}");
                 }
 
                 await dbContext.SaveChangesAsync();
