@@ -27,7 +27,7 @@ public class ScheduledRecipePublisher : BackgroundService
             using (var scope = _scopeFactory.CreateScope())
             {
                 var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationdbContext>();
-            
+
                 var dueRecipes = await dbContext.Recipes
                     .Include(r => r.Chef)
                     .ThenInclude(c => c.Subscribers)
@@ -35,8 +35,8 @@ public class ScheduledRecipePublisher : BackgroundService
                     .Include(r => r.Tags)
                     .Where(r => !r.IsPublished && r.TimeOfPublishement <= DateTime.UtcNow.AddHours(1))
                     .ToListAsync();
-                
-                if(dueRecipes.Any())
+
+                if (dueRecipes.Any())
                 {
                     foreach (var recipe in dueRecipes)
                     {
@@ -52,7 +52,7 @@ public class ScheduledRecipePublisher : BackgroundService
 
                 await dbContext.SaveChangesAsync();
             }
-            await Task.Delay(60000, stoppingToken); // execute every minute
+            await Task.Delay(10000, stoppingToken); // execute every minute
         }
     }
 }
