@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
 using let_em_cook.Models;
+using Newtonsoft.Json;
+
 namespace let_em_cook.Models;
 
 public class ApplicationUser : IdentityUser
@@ -17,6 +19,7 @@ public class ApplicationUser : IdentityUser
     
     public ICollection<Review> Reviews { get; set; }
 
+    [JsonIgnore]
     public ICollection<Recipe> Recipes { get; set; }
     
     public ICollection<Comment> Comments { get; set; }

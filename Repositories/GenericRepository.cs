@@ -1,16 +1,17 @@
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using let_em_cook.Data;
 
 namespace let_em_cook.Repositories;
 
 public class Repository<T> : IRepository<T> where T : class
 {
-    protected readonly DbContext _context;
+    protected readonly ApplicationdbContext _context;
     protected readonly DbSet<T> _dbSet;
 
-    public Repository(DbContext context)
+    public Repository(ApplicationdbContext context)
     {
-        _context = context ?? throw new ArgumentNullException(nameof(context));
+        _context = context;
         _dbSet = _context.Set<T>();
     }
 

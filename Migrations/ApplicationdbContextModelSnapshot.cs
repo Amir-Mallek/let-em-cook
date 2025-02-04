@@ -301,6 +301,28 @@ namespace let_em_cook.Migrations
                     b.ToTable("Comments");
                 });
 
+            modelBuilder.Entity("let_em_cook.Models.Image", b =>
+                {
+                    b.Property<int>("ImageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ImageId"));
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("RecipeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ImageId");
+
+                    b.HasIndex("RecipeId");
+
+                    b.ToTable("Images");
+                });
+
             modelBuilder.Entity("let_em_cook.Models.Ingredient", b =>
                 {
                     b.Property<int>("IngredientId")
@@ -344,6 +366,9 @@ namespace let_em_cook.Migrations
                     b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsPublished")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -595,6 +620,17 @@ namespace let_em_cook.Migrations
                     b.Navigation("Review");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("let_em_cook.Models.Image", b =>
+                {
+                    b.HasOne("let_em_cook.Models.Recipe", "Recipe")
+                        .WithMany()
+                        .HasForeignKey("RecipeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Recipe");
                 });
 
             modelBuilder.Entity("let_em_cook.Models.Recipe", b =>
