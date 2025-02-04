@@ -1,8 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using let_em_cook.Services;
-using Microsoft.AspNetCore.Http;
-using System.IO;
-using System.Threading.Tasks;
+using let_em_cook.Services.ServiceContracts;
 
 namespace let_em_cook.Controllers
 {
@@ -10,37 +7,31 @@ namespace let_em_cook.Controllers
     [ApiController]
     public class FileController : ControllerBase
     {
-        private readonly BlobService _blobService;
+        private readonly IFileService _fileService;
 
-        public FileController(BlobService blobService)
+        public FileController(IFileService fileService)
         {
-            _blobService = blobService;
+            _fileService = fileService;
         }
 
-        // POST api/file/upload
         [HttpPost("upload")]
         public async Task<IActionResult> UploadFile(IFormFile file)
         {
-            var containerName = "container";  // Define your container name
             var fileName = file.FileName;
-
-            // Open the file stream
+            Console.WriteLine(file.ContentType);
             using var stream = file.OpenReadStream();
 
-            // Upload the file to Blob Storage
-            await _blobService.UploadFileAsync(containerName, fileName, stream);
+            await _fileService.UploadFile(fileName, stream);
 
             return Ok(new { Message = "File uploaded successfully." });
         }
 
-        // GET api/file/download/{fileName}
         [HttpGet("download/{fileName}")]
         public async Task<IActionResult> DownloadFile(string fileName)
         {
-            var containerName = "container";  // Define your container name
-            var fileStream = await _blobService.DownloadFileAsync(containerName, fileName);
+            var fileStream = await _fileService.DownloadFile(fileName);
 
-            return File(fileStream, "application/octet-stream", fileName);  // Return the file for download
+            return File(fileStream, "application/octet-stream", fileName);
         }
     }
 }

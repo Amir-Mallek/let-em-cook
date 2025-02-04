@@ -25,9 +25,8 @@ namespace let_em_cook.Models
 
         [Required]
         public string ImageUrl { get; set; }
-
-        [Required]
-        public string UserId { get; set; }
+        
+        public string? UserId { get; set; }
 
         [DataType(DataType.Time)]
         public DateTime? TimeOfPublishement { get; set; }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Security.Claims;
 
 namespace let_em_cook.Controllers
 {
@@ -25,10 +26,13 @@ namespace let_em_cook.Controllers
 
         // Create a new recipe and either publish immediately or schedule
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<RecipeDto>> CreateRecipe([FromBody] RecipeCreateDto recipe, bool publishImmediately = false)
         {
             try
             {
+                var userId = User.Claims.First(c => c.Type == ClaimTypes.Name).Value;
+                recipe.UserId = userId;
                 var recipeObject = await _recipeService.CreateRecipeAsync(recipe, publishImmediately);
                 return CreatedAtAction(nameof(GetRecipe), new { id = recipeObject.RecipeId }, recipeObject);
             }
