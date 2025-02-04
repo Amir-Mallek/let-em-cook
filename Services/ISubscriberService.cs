@@ -8,6 +8,4 @@ public interface ISubscriberService
     Task<bool> UnsubscribeAsync(string userId, string chefId);
     Task<IEnumerable<SubscriberDto>> GetSubscribersForChefAsync(string chefId);
     Task<IEnumerable<SubscriptionDto>> GetSubscriptionsForUserAsync(string userId);
-
-    Task NotifySubscribersAsync(Recipe recipe);
 }

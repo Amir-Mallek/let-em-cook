@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using let_em_cook.Services;
+using Microsoft.AspNetCore.Authorization;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -11,7 +12,8 @@ public class SubscribersController : ControllerBase
     {
         _subscriberService = subscriberService;
     }
-
+    
+    [Authorize]
     [HttpPost("subscribe/{userId}/{chefId}")]
     public async Task<IActionResult> SubscribeUserToChef(string userId, string chefId)
     {
@@ -26,6 +28,7 @@ public class SubscribersController : ControllerBase
         }
     }
 
+    [Authorize]
     [HttpDelete("unsubscribe/{userId}/{chefId}")]
     public async Task<IActionResult> UnsubscribeUserFromChef(string userId, string chefId)
     {

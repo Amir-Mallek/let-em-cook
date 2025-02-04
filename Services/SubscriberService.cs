@@ -7,16 +7,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 
-//placeholder for the mailing service
-public interface IMailingService
-{
-    Task SendEmailAsync(string email, string subject, string emailContent);
-}
 
 public class SubscriberService : ISubscriberService
 {
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly IMailingService _mailingService;
 
     private readonly UserRepository _userRepo;
 
@@ -30,7 +24,6 @@ public class SubscriberService : ISubscriberService
 
     public async Task<bool> SubscribeAsync(string userId, string chefId)
     {
-        // Prevent self-subscription
         if (userId == chefId)
             return false;
 
@@ -45,15 +38,12 @@ public class SubscriberService : ISubscriberService
         if (user == null || chef == null)
             return false;
 
-        // Check if subscription already exists
         if (user.Subscriptions.Any(u => u.Id == chefId))
             return true;
 
-        // Add bidirectional relationship
         user.Subscriptions.Add(chef);
         chef.Subscribers.Add(user);
 
-        // Update both entities
         var userResult = await _userManager.UpdateAsync(user);
         var chefResult = await _userManager.UpdateAsync(chef);
 
@@ -73,7 +63,6 @@ public class SubscriberService : ISubscriberService
         if (user == null || chef == null)
             return false;
 
-        // Remove bidirectional relationship
         var userSubscription = user.Subscriptions.FirstOrDefault(u => u.Id == chefId);
 
         var chefSubscriber = chef.Subscribers.FirstOrDefault(u => u.Id == userId);
@@ -81,7 +70,6 @@ public class SubscriberService : ISubscriberService
         if (userSubscription != null) user.Subscriptions.Remove(userSubscription);
         if (chefSubscriber != null) chef.Subscribers.Remove(chefSubscriber);
 
-        // Update both entities
         var userResult = await _userManager.UpdateAsync(user);
         var chefResult = await _userManager.UpdateAsync(chef);
 
@@ -124,34 +112,5 @@ public class SubscriberService : ISubscriberService
                 SubscriptionDate = DateTime.UtcNow 
             })
             .ToList();
-    }
-
-    public async Task NotifySubscribersAsync(Recipe recipe)
-    {
-        // Get the chef's subscribers
-        var subscribers = await GetSubscribersForChefAsync(recipe.UserId);
-
-        // Get chef details
-        var chef = await _userManager.FindByIdAsync(recipe.UserId);
-        
-        // Prepare email content
-        var subject = $"{chef.UserName} published a new recipe!";
-        var emailContent = $"""
-            <h2>New Recipe Alert from {chef.UserName}!</h2>
-            <h3>{recipe.Name}</h3>
-            <p>{recipe.Description}</p>
-            <p>Difficulty: {recipe.Difficulty}</p>
-            <p>Cooking Time: {recipe.Duration:hh\\:mm}</p>
-            <a href="/recipes/{recipe.RecipeId}">View full recipe</a>
-            """;
-
-        var emailTasks = subscribers.Select(subscriber => 
-        _mailingService.SendEmailAsync(
-            subscriber.Email,
-            subject,
-            emailContent)
-        );
-
-        await Task.WhenAll(emailTasks);
-    }
+    }    
 }
